@@ -14,11 +14,12 @@ namespace InformatikaiEszkozok_LIB.MODEL
     public class ViewRendelesTetel
     {
         [Key]
+        public int Id { get; set; }
         public int RendelesId { get; set; }
         public string? Termeknev { get; set; }
         public int Mennyiseg { get; set; }
         public int Egysegar { get; set; }
-        public int? Kedvezmeny { get; set; }
-        public int? Ar { get; set; }
+        public int Kedvezmeny { get; set; }
+        public int Ar { get; set; }
     }
 }
