@@ -1,0 +1,86 @@
+﻿<div class="rendeles-doboz h-100">
+    <h3>Vásárló adatai</h3>
+
+    <p>
+        Érvényes diákazonosító esetén a rendszer 20% kedvezményt számol.
+    </p>
+
+    <!-- Diákazonosító -->
+    <div class="mb-3">
+        <label class="form-label">Diákazonosító</label>
+
+        <div class="input-group">
+            <input class="form-control" @bind="diakAzonosito" />
+
+            <button class="btn btn-sajat"
+                    type="button"
+                    @onclick="DiakEllenorzes">
+                Ellenőrzés
+            </button>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(uzenet))
+        {
+            <small class="@(Kedvezmenyes ? "text-success" : "text-danger")">
+                @uzenet
+            </small>
+        }
+    </div>
+
+    <!-- Név -->
+    <div class="mb-3">
+        <label class="form-label">Név</label>
+        <input class="form-control" @bind="nev" />
+    </div>
+
+    <!-- Telefon -->
+    <div class="mb-3">
+        <label class="form-label">Telefon</label>
+        <input class="form-control" @bind="telefon" />
+    </div>
+
+    <!-- Email -->
+    <div class="mb-3">
+        <label class="form-label">E-mail</label>
+        <input class="form-control" @bind="email" />
+    </div>
+
+    <button class="btn btn-sajat w-100" type="button">
+        Rendelés leadása
+    </button>
+</div>
+
+@code {
+    [Parameter]
+    public bool Kedvezmenyes { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> KedvezmenyesChanged { get; set; }
+
+    private string diakAzonosito = "";
+    private string nev = "";
+    private string telefon = "";
+    private string email = "";
+
+    private string uzenet = "";
+
+    /// <summary>
+    /// Ellenőrzi a diákazonosítót.
+    /// Egyszerű vizsgás logika: ha nem üres → érvényes.
+    /// </summary>
+    private async Task DiakEllenorzes()
+    {
+        if (!string.IsNullOrWhiteSpace(diakAzonosito))
+        {
+            Kedvezmenyes = true;
+            uzenet = "Érvényes diákazonosító – 20% kedvezmény!";
+        }
+        else
+        {
+            Kedvezmenyes = false;
+            uzenet = "Érvénytelen diákazonosító!";
+        }
+
+        await KedvezmenyesChanged.InvokeAsync(Kedvezmenyes);
+    }
+}

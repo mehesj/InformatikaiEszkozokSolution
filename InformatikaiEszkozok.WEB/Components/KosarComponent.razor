@@ -1,0 +1,52 @@
+﻿@using InformatikaiEszkozok.WEB.SERVICE
+@inject KosarService kosarService
+
+<div class="rendeles-doboz h-100">
+    <h3>Rendelési kosár</h3>
+
+    <p>A kiválasztott termékek összesítése.</p>
+
+    <hr />
+
+    @if (!kosarService.Tetelek.Any())
+    {
+        <div class="alert alert-warning">
+            A kosár jelenleg üres.
+        </div>
+    }
+    else
+    {
+        @foreach (var tetel in kosarService.Tetelek)
+        {
+            <div class="d-flex justify-content-between border-bottom py-2">
+                <div>
+                    <strong>@tetel.Nev</strong>
+                    <span class="ms-2">
+                        @tetel.Mennyiseg db × @tetel.Egysegar.ToString("N0") Ft
+                    </span>
+                </div>
+
+                <strong>
+                    @((tetel.Mennyiseg * tetel.Egysegar).ToString("N0")) Ft
+                </strong>
+            </div>
+        }
+
+        <div class="osszegzes-doboz mt-4">
+            <p>Összesen: @Osszesen.ToString("N0") Ft</p>
+            <p>Kedvezmény: @Kedvezmeny.ToString("N0") Ft</p>
+            <h5>Fizetendő: @Fizetendo.ToString("N0") Ft</h5>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public bool Kedvezmenyes { get; set; }
+
+    private int Osszesen => kosarService.Tetelek.Sum(tetel => tetel.Egysegar * tetel.Mennyiseg);
+
+    private int Kedvezmeny => Kedvezmenyes ? Osszesen * 20 / 100 : 0;
+
+    private int Fizetendo => Osszesen - Kedvezmeny;
+}
