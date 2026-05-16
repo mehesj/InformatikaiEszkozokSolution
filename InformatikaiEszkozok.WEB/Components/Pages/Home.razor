@@ -2,6 +2,9 @@
 @using InformatikaiEszkozok.WEB.ViewModel
 @using InformatikaiEszkozok_LIB
 @using InformatikaiEszkozok_LIB.MODEL
+@using InformatikaiEszkozok.WEB.SERVICE
+
+@inject KosarService kosarService
 
 <PageTitle>Home</PageTitle>
 
@@ -159,6 +162,13 @@
                 </button>
             </div>
 
+            @if (!string.IsNullOrWhiteSpace(kosarUzenet))
+            {
+                <div class="alert alert-success">
+                    @kosarUzenet
+                </div>
+            }
+
             <div class="modal-body">
 
                 @foreach (var termek in termekek)
@@ -206,7 +216,7 @@
                 </button>
 
                 <NavLink href="/rendeles" class="btn btn-sajat">
-                    Rendelés véglegesítése
+                    Rendelés véglegesítése (@KosarDarabszam db)
                 </NavLink>
             </div>
 
@@ -215,8 +225,11 @@
 </div>
 
 @code {
+    private string kosarUzenet = "";
+    private int KosarDarabszam => kosarService.Darabszam;
+
     private List<Termek> termekek = new();
-    private List<KosarTetel> kosar = new();
+    // private List<KosarTetel> kosar = new();
 
     private Dictionary<int, int> mennyisegek = new();
 
@@ -252,11 +265,23 @@
             return;
         }
 
-        var kosarTetel = kosar.FirstOrDefault(kosarTetel => kosarTetel.TermekId == termek.Id); // Van már a tétel?
+        // var kosarTetel = kosar.FirstOrDefault(kosarTetel => kosarTetel.TermekId == termek.Id); // Van már a tétel?
 
-        if (kosarTetel == null)
+        // A szervízből vesszük a kosár tartalmát, így biztosítva, hogy mindig a legfrissebb adatokat használjuk (versenyhelyzet elkerülése)
+        var kosarTetel = kosarService.Tetelek.FirstOrDefault(kosarTetel => kosarTetel.TermekId == termek.Id);
+
+        if (kosarTetel == null) // Ha még nincs a kosárban
         {
-            kosar.Add(new KosarTetel
+            // kosar.Add(new KosarTetel
+            // {
+            //     TermekId = termek.Id,
+            //     Nev = termek.Nev,
+            //     Egysegar = termek.Egysegar,
+            //     Mennyiseg = mennyiseg,
+            //     KepFajlnev = termek.KepFajlnev
+            // });
+
+            kosarService.Tetelek.Add(new KosarTetel
             {
                 TermekId = termek.Id,
                 Nev = termek.Nev,
@@ -265,7 +290,7 @@
                 KepFajlnev = termek.KepFajlnev
             });
         }
-        else
+        else // Ha van már ilyen tétel, a mennyiséget módosítjuk
         {
             if (kosarTetel.Mennyiseg + mennyiseg > termek.Keszlet)
             {
@@ -276,5 +301,6 @@
         }
 
         mennyisegek[termek.Id] = 0;
+        kosarUzenet = $"{termek.Nev} kosárba téve!";
     }
 }
