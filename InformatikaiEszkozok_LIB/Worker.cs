@@ -46,5 +46,14 @@ namespace InformatikaiEszkozok_LIB
         {
             return await ApiClient.GetListaAsync<ViewRendelesTetel>($"Rendeles/RendelesTetelek/{rendelesId}");
         }
+
+        /// <summary>
+        /// Az elérhető termékek listájának lekérése az API-ról, az összes tulajdonságukkal.
+        /// </summary>
+        /// <returns></returns>
+        public static async Task<List<Termek>> Termekek()
+        {
+            return await ApiClient.GetListaAsync<Termek>("Termek/Termekek");
+        }
     }
 }

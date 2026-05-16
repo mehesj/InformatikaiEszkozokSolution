@@ -1,4 +1,6 @@
 ﻿@page "/"
+@using InformatikaiEszkozok_LIB
+@using InformatikaiEszkozok_LIB.MODEL
 
 <PageTitle>Home</PageTitle>
 
@@ -91,13 +93,45 @@
                 <button id="termekekLekerdezesGomb"
                         class="btn btn-sajat mt-3"
                         data-bs-toggle="modal"
-                        data-bs-target="#termekModal">
+                        data-bs-target="#termekModal"
+                        @onclick="TermekekBetoltese">
                     Termékek lekérdezése
                 </button>
             </div>
 
             <div id="termekKartyaTarolo" class="row g-4">
                 @* Ide jönnek majd az API-ból érkező termékkártyák *@
+                @foreach (var t in termekek)
+                {
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card h-100 shadow-sm">
+
+                            <img src="img/@t.KepFajlnev"
+                                 class="card-img-top"
+                                 alt="@t.Nev" />
+
+                            <div class="card-body">
+                                <h5 class="card-title">@t.Nev</h5>
+
+                                <p class="card-text">
+                                    Egységár: @t.Egysegar Ft<br />
+                                    Készleten: @t.Keszlet db
+                                </p>
+
+                                <p class="card-text small text-muted">
+                                    @t.Leiras
+                                </p>
+                            </div>
+
+                            <div class="card-footer text-center">
+                                <button class="btn btn-sajat w-100">
+                                    Tovább
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                }
             </div>
         </div>
     </section>
@@ -123,7 +157,35 @@
             </div>
 
             <div class="modal-body">
-                <div id="termekLista"></div>
+                @* <div id="termekLista"></div> *@
+                @if (termekek.Any())
+                {
+                    @foreach (var termek in termekek)
+                    {
+                        <div class="d-flex align-items-center justify-content-between border-bottom py-2">
+                            <div>
+                                <strong>@termek.Nev</strong>
+                                <span>@termek.Egysegar Ft</span>
+                            </div>
+
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="number"
+                                       class="form-control form-control-sm text-center"
+                                       style="width: 70px;"
+                                       min="0"
+                                       value="0" />
+
+                                <button class="btn btn-sajat btn-sm">
+                                    Kosárba
+                                </button>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p>Nincsenek termékek.</p>
+                }
             </div>
 
             <div class="modal-footer">
@@ -140,3 +202,13 @@
         </div>
     </div>
 </div>
+
+@code {
+    private List<Termek> termekek = new();
+
+
+    private async Task TermekekBetoltese()
+    {
+        termekek = await Worker.Termekek();
+    }
+}
