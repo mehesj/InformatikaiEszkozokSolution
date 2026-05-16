@@ -1,6 +1,7 @@
 <Solution>
   <Project Path="InformatikaiEszkozok.API/InformatikaiEszkozok.API.csproj" Id="4147dd09-e7b1-4005-8c24-48eca8e0d796" />
   <Project Path="InformatikaiEszkozok.Console/InformatikaiEszkozok.Console.csproj" Id="7bb04d12-be53-439c-bd16-4b0ac6a32c82" />
+  <Project Path="InformatikaiEszkozok.WEB/InformatikaiEszkozok.WEB.csproj" Id="d0d792f1-7e81-436f-abc4-bdb602a4e501" />
   <Project Path="InformatikaiEszkozok_LIB/InformatikaiEszkozok_LIB.csproj" />
   <Project Path="LoadData.Console/LoadData.Console.csproj" />
 </Solution>

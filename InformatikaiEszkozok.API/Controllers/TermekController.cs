@@ -32,5 +32,16 @@ namespace InformatikaiEszkozok.Controllers
 
             return Ok(keszlet);
         }
+
+        // api/Termek/Termekek
+        [HttpGet("Termekek")]
+        public async Task<IActionResult> Termekek()
+        {
+            var termekek = await context.Termek
+                .Where(termek => termek.Elerheto)
+                .ToListAsync();
+
+            return Ok(termekek);
+        }
     }
 }

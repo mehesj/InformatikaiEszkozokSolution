@@ -1,0 +1,142 @@
+﻿@page "/"
+
+<PageTitle>Home</PageTitle>
+
+
+<header class="hero-szekcio">
+    <div class="container hero-tartalom text-center">
+        <h1>Informatikai termékbolt</h1>  @* 3. feladat  Eredetileg hiányzik a nyitó tag*@
+         
+            Válassza ki a megvásárolható informatikai termékeket, tegye őket a kosárba,
+            majd adja le a rendelését.
+           
+        <div class="d-flex justify-content-center gap-3 flex-wrap mt-4">
+
+            @* 3. feladat  Menü beállítása*@
+            <!-- Termékek (oldalon belüli ugrás) -->
+            <a href="#termekek" class="btn btn-sajat btn-lg px-5">
+                Termékek megtekintése
+            </a>
+
+            <!-- Rendelés oldal -->
+            <NavLink href="/rendeles" class="btn btn-vilagos btn-lg px-5">
+                Kosár megnyitása
+            </NavLink>
+        </div>
+    </div>
+</header> 
+
+<main>
+    <!-- ===================================================== -->
+    <!-- MŰKÖDÉS                                               -->
+    <!-- ===================================================== -->
+    <section id="mukodes" class="tartalmi-szekcio">         @* 4. feladat  mukodes azonosító*@
+        <div class="container">                             @* 4. feladat  Container stílus*@
+
+            <div class="text-center mb-5 mx-auto" style="max-width: 700px;">   @* 4. feladat  Középre tervezett, alsó margó 5*@
+                <h2>Hogyan működik?</h2>
+                <p>
+                    A vásárló megtekinti a termékeket, kiválasztja a kívánt mennyiséget,
+                    majd a rendelés oldalon véglegesíti a vásárlást.
+                </p>
+            </div>
+
+            <div class="row g-4">  @* 5. feladat  Minta szerinti elrendezés (Térköz)*@
+
+                <div class="col-12 col-md-6 col-lg-4">   @* 5. feladat  Rács viselkedése*@
+                    <div class="info-doboz h-100 shadow-sm">
+                        <h3>1. Termékek megtekintése</h3>
+                        <p>
+                            A rendszer megjeleníti az adatbázisban tárolt termékeket,
+                            azok árát, készletét és rövid leírását.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="info-doboz h-100 shadow-sm">
+                        <h3>2. Kosár összeállítása</h3>
+                        <p>
+                            A vásárló megadja a kívánt mennyiséget, majd a terméket
+                            a kosárba helyezi.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="info-doboz h-100 shadow-sm">
+                        <h3>3. Rendelés leadása</h3>
+                        <p>
+                            A rendelés oldalon a vásárló megadja az adatait. Érvényes
+                            diákazonosító esetén 20% kedvezményt kap.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ===================================================== -->
+    <!-- TERMÉKEK                                              -->
+    <!-- ===================================================== -->
+    <section id="termekek" class="kiemelt-szekcio py-5">
+        <div class="container">
+            <div class="text-center mb-4">
+                <h2>Termékek</h2>
+                <p class="bevezeto-szoveg">
+                    A termékek lekérdezése után megjelennek a megvásárolható informatikai termékek.
+                </p>
+
+                <button id="termekekLekerdezesGomb"
+                        class="btn btn-sajat mt-3"
+                        data-bs-toggle="modal"
+                        data-bs-target="#termekModal">
+                    Termékek lekérdezése
+                </button>
+            </div>
+
+            <div id="termekKartyaTarolo" class="row g-4">
+                @* Ide jönnek majd az API-ból érkező termékkártyák *@
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- ========================================================= -->
+<!-- MODAL                                                    -->
+<!-- ========================================================= -->
+<div class="modal fade" id="termekModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h5 id="modalCim" class="modal-title">Termékek</h5>
+                    <p id="modalAlcim" class="mb-0 modal-alcim"></p>
+                </div>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Bezárás">
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div id="termekLista"></div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-vilagos"
+                        data-bs-dismiss="modal">
+                    Bezárás
+                </button>
+
+                <NavLink href="/rendeles" class="btn btn-sajat">  @* rendeles oldal hívása *@
+                    Rendelés véglegesítése
+                </NavLink>
+            </div>
+        </div>
+    </div>
+</div>

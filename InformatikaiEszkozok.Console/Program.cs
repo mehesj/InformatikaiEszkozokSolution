@@ -139,6 +139,7 @@ static void RendelesKiir(string cim, ViewRendelesOsszesites rendeles, List<ViewR
     }
     Console.WriteLine();
 
+    // Kedvezmény ha van, akkor kiírjuk a kedvezmény összegét
     if (rendeles.Kedvezmeny > 0)
     {
         Console.WriteLine(

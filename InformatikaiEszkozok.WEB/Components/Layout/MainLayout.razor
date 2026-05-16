@@ -1,0 +1,43 @@
+﻿@inherits LayoutComponentBase
+
+<nav class="navbar navbar-expand-lg fixed-top shadow-sm">
+    <div class="container">
+        <NavLink class="navbar-brand fw-bold d-flex align-items-center" href="/">
+            <span class="brand-jel">IT</span>
+            Informatikai Termékbolt
+        </NavLink>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="menu">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">Főoldal</NavLink>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#mukodes">Működés</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#termekek">Termékek</a>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/rendeles">Rendelés</NavLink>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main>
+    @Body
+</main>
+
+<footer class="footer">
+    <div class="container text-center">
+        <p class="mb-0">
+            © 2026 Informatikai Termékbolt – rendelésleadó felület
+        </p>
+    </div>
+</footer>
