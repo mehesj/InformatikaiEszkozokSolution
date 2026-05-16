@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using InformatikaiEszkozok.WEB.ViewModel
 @using InformatikaiEszkozok_LIB
 @using InformatikaiEszkozok_LIB.MODEL
 
@@ -173,10 +174,21 @@
                             <input type="number"
                                    class="form-control form-control-sm text-center"
                                    style="width: 70px;"
-                                   min="0"
-                                   value="0" />
+                                   min="0" 
+                                   max="@termek.Keszlet"
+                                   @bind="mennyisegek[termek.Id]"
+                                   @bind:event="oninput" />
 
-                            <button class="btn btn-sajat btn-sm">
+                            @if (mennyisegek[termek.Id] > termek.Keszlet) // Ha a beírt mennyiség nagyobb, mint a készlet, akkor hibaüzenet jelenik meg
+                            {
+                                <small class="text-danger">
+                                    Nincs elegendő készlet!
+                                </small>
+                            }
+                            
+                            <button class="btn btn-sajat btn-sm"
+                                    disabled="@(mennyisegek[termek.Id] <= 0 || mennyisegek[termek.Id] > termek.Keszlet)" 
+                                    @onclick="() => Kosarba(termek)">
                                 Kosárba
                             </button>
                         </div>
@@ -204,10 +216,65 @@
 
 @code {
     private List<Termek> termekek = new();
+    private List<KosarTetel> kosar = new();
 
+    private Dictionary<int, int> mennyisegek = new();
 
+    /// <summary>
+    /// Lekéri az API-ból a termékeket, és minden termékhez létrehoz egy 0 kezdőmennyiséget.
+    /// </summary>
     private async Task TermekekBetoltese()
     {
         termekek = await Worker.Termekek();
+
+        foreach (var termek in termekek) // Minden termékhez létrehozunk egy 0 kezdőmennyiséget
+        {
+            mennyisegek[termek.Id] = 0;
+        }
+    }
+
+    /// <summary>
+    /// A kiválasztott terméket a megadott mennyiséggel a kosárba helyezi.
+    /// </summary>
+    /// <param name="termek">A kosárba helyezendő termék.</param>
+    private void Kosarba(Termek termek)
+    {
+        int mennyiseg = mennyisegek[termek.Id];
+
+        // Mennyiség ellenőrzés - Állapot késhet, lehet versenyhelyzet ( :) + biztosítás)
+        if (mennyiseg <= 0) // Nem helyezünk a kosárba 0 vagy negatív mennyiséget
+        {
+            return;
+        }
+
+        if (mennyiseg > termek.Keszlet) // Nem helyezünk a kosárba a készletnél nagyobb mennyiséget
+        {
+            return;
+        }
+
+        var kosarTetel = kosar.FirstOrDefault(kosarTetel => kosarTetel.TermekId == termek.Id); // Van már a tétel?
+
+        if (kosarTetel == null)
+        {
+            kosar.Add(new KosarTetel
+            {
+                TermekId = termek.Id,
+                Nev = termek.Nev,
+                Egysegar = termek.Egysegar,
+                Mennyiseg = mennyiseg,
+                KepFajlnev = termek.KepFajlnev
+            });
+        }
+        else
+        {
+            if (kosarTetel.Mennyiseg + mennyiseg > termek.Keszlet)
+            {
+                return;
+            }
+
+            kosarTetel.Mennyiseg += mennyiseg;
+        }
+
+        mennyisegek[termek.Id] = 0;
     }
 }
