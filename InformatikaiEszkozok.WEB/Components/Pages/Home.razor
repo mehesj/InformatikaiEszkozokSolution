@@ -5,6 +5,7 @@
 @using InformatikaiEszkozok.WEB.SERVICE
 
 @inject KosarService kosarService
+@inject NavigationManager navigation
 
 <PageTitle>Home</PageTitle>
 
@@ -215,9 +216,16 @@
                     Bezárás
                 </button>
 
-                <NavLink href="/rendeles" class="btn btn-sajat">
+                @* <NavLink href="/rendeles" class="btn btn-sajat"> 
                     Rendelés véglegesítése (@KosarDarabszam db)
-                </NavLink>
+                </NavLink> *@
+
+                <button type="button"
+                        class="btn btn-sajat"
+                        data-bs-dismiss="modal"
+                        @onclick="RendelesOldalMegnyitasa">
+                    Rendelés véglegesítése
+                </button>
             </div>
 
         </div>
@@ -302,5 +310,13 @@
 
         mennyisegek[termek.Id] = 0;
         kosarUzenet = $"{termek.Nev} kosárba téve!";
+    }
+
+    /// <summary>
+    /// Átnavigál a rendelés véglegesítése oldalra.
+    /// </summary>
+    private void RendelesOldalMegnyitasa()
+    {
+        navigation.NavigateTo("/rendeles");
     }
 }

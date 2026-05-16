@@ -1,7 +1,87 @@
 ﻿@page "/rendeles"
+@using InformatikaiEszkozok.WEB.SERVICE
+@using InformatikaiEszkozok.WEB.ViewModel
 
-<h3>Rendelés</h3>
+@inject KosarService kosarService
+
+<PageTitle>Rendelés véglegesítése</PageTitle>
+
+<section class="kiemelt-szekcio py-5">
+    <div class="container">
+
+        <div class="text-center mb-4">
+            <h2>Rendelés véglegesítése</h2>
+            <p class="bevezeto-szoveg">
+                Ellenőrizze a kosár tartalmát, majd adja meg a rendeléshez szükséges adatokat.
+            </p>
+        </div>
+
+        @if (!kosarService.Tetelek.Any())
+        {
+            <div class="alert alert-warning text-center">
+                A kosár jelenleg üres.
+            </div>
+
+            <div class="text-center">
+                <NavLink href="/" class="btn btn-sajat">
+                    Vissza a termékekhez
+                </NavLink>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Termék</th>
+                            <th class="text-end">Egységár</th>
+                            <th class="text-center">Mennyiség</th>
+                            <th class="text-end">Részösszeg</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var tetel in kosarService.Tetelek)
+                        {
+                            <tr>
+                                <td>@tetel.Nev</td>
+                                <td class="text-end">@tetel.Egysegar.ToString("N0") Ft</td>
+                                <td class="text-center">@tetel.Mennyiseg db</td>
+                                <td class="text-end">@((tetel.Egysegar * tetel.Mennyiseg).ToString("N0")) Ft</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="3" class="text-end">Fizetendő összeg:</th>
+                            <th class="text-end">@Vegosszeg.ToString("N0") Ft</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div class="text-end mt-4">
+                <button class="btn btn-vilagos me-2" @onclick="KosarUritese">
+                    Kosár ürítése
+                </button>
+
+                <button class="btn btn-sajat">
+                    Rendelés leadása
+                </button>
+            </div>
+        }
+
+    </div>
+</section>
 
 @code {
+    private int Vegosszeg => kosarService.Tetelek.Sum(tetel => tetel.Egysegar * tetel.Mennyiseg);
 
+    /// <summary>
+    /// Kiüríti a kosár tartalmát.
+    /// </summary>
+    private void KosarUritese()
+    {
+        kosarService.Urit();
+    }
 }
