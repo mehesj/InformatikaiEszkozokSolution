@@ -55,5 +55,24 @@ namespace InformatikaiEszkozok_LIB
         {
             return await ApiClient.GetListaAsync<Termek>("Termek/Termekek");
         }
+
+        /// <summary>
+        /// Vásárló ellenőrzése email és telefonszám alapján.
+        /// </summary>
+        public static async Task<Vasarlo?> VasarloKereses(string email, string telefon)
+        {
+            return await ApiClient.GetAsync<Vasarlo>(
+                $"Vasarlo/Kereses?email={email}&telefon={telefon}");
+        }
+
+        /// <summary>
+        /// Rendelés elküldése az API-nak.
+        /// </summary>
+        public static async Task<bool> RendelesRogzites(RendelesRogzitesAdat adat)
+        {
+            var response = await ApiClient.PostAsync("Rendeles/RendelesRogzites", adat);
+
+            return response.IsSuccessStatusCode;
+        }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using InformatikaiEszkozok_LIB.DATA;
+using InformatikaiEszkozok_LIB.MODEL;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace InformatikaiEszkozok.Controllers
 {
@@ -33,6 +35,38 @@ namespace InformatikaiEszkozok.Controllers
                 .ToListAsync();
 
             return Ok(tetelek);
+        }
+
+        // api/Rendeles/RendelesRogzites
+        [HttpPost("RendelesRogzites")]
+        public async Task<IActionResult> RendelesRogzites([FromBody] RendelesRogzitesAdat adat)
+        {
+           
+            if (adat.Vasarlo.Id == 0)
+            {
+                context.Vasarlo.Add(adat.Vasarlo);
+                await context.SaveChangesAsync();
+            }
+
+            var rendeles = new Rendeles
+            {
+                VasarloId = adat.Vasarlo.Id,
+                Datum = DateOnly.FromDateTime(DateTime.Now)
+            };
+
+            context.Rendeles.Add(rendeles);
+            await context.SaveChangesAsync();
+
+            foreach (var tetel in adat.Tetelek)
+            {
+                tetel.Id = 0;
+                tetel.RendelesId = rendeles.Id;
+            }
+
+            context.RendelesTetel.AddRange(adat.Tetelek);
+            await context.SaveChangesAsync();
+
+            return Ok(adat.Vasarlo);
         }
     }
 }

@@ -1,4 +1,9 @@
-﻿<div class="rendeles-doboz h-100">
+﻿@using InformatikaiEszkozok.WEB.SERVICE
+@using InformatikaiEszkozok_LIB
+@using InformatikaiEszkozok_LIB.MODEL
+@inject KosarService kosarService
+
+<div class="rendeles-doboz h-100">
     <h3>Vásárló adatai</h3>
 
     <p>
@@ -45,7 +50,8 @@
         <input class="form-control" @bind="email" />
     </div>
 
-    <button class="btn btn-sajat w-100" type="button">
+    <button class="btn btn-sajat w-100" type="button" 
+        @onclick="RendelesLeadasa">
         Rendelés leadása
     </button>
 </div>
@@ -57,20 +63,47 @@
     [Parameter]
     public EventCallback<bool> KedvezmenyesChanged { get; set; }
 
+    private int id = 0;
     private string diakAzonosito = "";
     private string nev = "";
     private string telefon = "";
     private string email = "";
 
     private string uzenet = "";
+    private Vasarlo? vasarlo;
 
     /// <summary>
-    /// Ellenőrzi a diákazonosítót.
-    /// Egyszerű vizsgás logika: ha nem üres → érvényes.
+    /// Email és telefon alapján megkeresi a vásárlót.
+    /// Ha a megadott diákazonosító egyezik az adatbázisban tárolttal,
+    /// akkor kedvezményre jogosult.
     /// </summary>
     private async Task DiakEllenorzes()
     {
-        if (!string.IsNullOrWhiteSpace(diakAzonosito))
+        if (string.IsNullOrWhiteSpace(email) ||
+            string.IsNullOrWhiteSpace(telefon))
+        {
+            uzenet = "Email és telefonszám megadása szükséges!";
+            Kedvezmenyes = false;
+            await KedvezmenyesChanged.InvokeAsync(false);
+            return;
+        }
+
+        vasarlo = await Worker.VasarloKereses(email, telefon);
+
+        if (vasarlo == null)
+        {
+            uzenet = "A vásárló nem található. Új vásárlóként kerül rögzítésre.";
+            Kedvezmenyes = false;
+            await KedvezmenyesChanged.InvokeAsync(false);
+            return;
+        }
+        id = vasarlo.Id;
+        nev = vasarlo.Nev ?? "";
+        email = vasarlo.Email ?? "";
+        telefon = vasarlo.Telefon ?? "";
+
+        if (!string.IsNullOrWhiteSpace(diakAzonosito) &&
+            vasarlo.Azonosito?.Trim() == diakAzonosito.Trim())
         {
             Kedvezmenyes = true;
             uzenet = "Érvényes diákazonosító – 20% kedvezmény!";
@@ -78,9 +111,79 @@
         else
         {
             Kedvezmenyes = false;
-            uzenet = "Érvénytelen diákazonosító!";
+            uzenet = "A vásárló azonosítva, de kedvezmény nem jár.";
         }
 
         await KedvezmenyesChanged.InvokeAsync(Kedvezmenyes);
+    }
+
+    /// <summary>
+    /// Ellenőrzi a rendelés adatait, rendelés leadáskor is megkeresi a vásárlót,
+    /// majd elküldi a rendelést az API-nak.
+    /// </summary>
+    private async Task RendelesLeadasa()
+    {
+        if (kosarService.Tetelek.Count == 0)
+        {
+            uzenet = "A kosár üres!";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(nev) ||
+            string.IsNullOrWhiteSpace(email) ||
+            string.IsNullOrWhiteSpace(telefon))
+        {
+            uzenet = "Minden vásárlói adat kitöltése kötelező!";
+            return;
+        }
+
+        var rendelesVasarlo = await Worker.VasarloKereses(email, telefon);
+
+        if (rendelesVasarlo == null)
+        {
+            rendelesVasarlo = new Vasarlo
+            {
+                Id = 0,
+                Azonosito = string.IsNullOrWhiteSpace(diakAzonosito) ? " " : diakAzonosito,
+                Nev = nev,
+                Email = email,
+                Telefon = telefon
+            };
+        }
+
+        var adat = new RendelesRogzitesAdat
+        {
+            Vasarlo = rendelesVasarlo,
+
+            Tetelek = kosarService.Tetelek.Select(tetel => new RendelesTetel
+            {
+                Id = 0,
+                RendelesId = 0,
+                TermekId = tetel.TermekId,
+                Mennyiseg = tetel.Mennyiseg
+            }).ToList()
+        };
+
+        bool sikeres = await Worker.RendelesRogzites(adat);
+
+        if (sikeres)
+        {
+            kosarService.Urit();
+
+            vasarlo = null;
+            diakAzonosito = "";
+            nev = "";
+            email = "";
+            telefon = "";
+
+            Kedvezmenyes = false;
+            await KedvezmenyesChanged.InvokeAsync(false);
+
+            uzenet = "A rendelés sikeresen rögzítve!";
+        }
+        else
+        {
+            uzenet = "Hiba történt a rendelés mentése közben!";
+        }
     }
 }

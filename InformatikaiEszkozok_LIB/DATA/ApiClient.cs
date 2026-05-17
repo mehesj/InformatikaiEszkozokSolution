@@ -27,5 +27,38 @@ namespace InformatikaiEszkozok_LIB.DATA
 
             return lista ?? new List<T>();
         }
+
+        /// <summary>
+        /// Generikus metódus egy adott típusú objektum lekérésére egy megadott végpontról.
+        /// NEM LISTA, hanem egyetlen objektum lekérése, például egy termék 
+        /// vagy vásárló részletes adatai.
+        /// Ezt használjuk pl. egy vásárló ellenőrzésére.
+        /// </summary>
+        /// <typeparam name="T">A lekért objektum típusa.</typeparam>
+        /// <param name="vegpont">Az API végpont.</param>
+        /// <returns>A lekért objektum, vagy null, ha nincs találat.</returns>
+        public static async Task<T?> GetAsync<T>(string vegpont)
+        {
+            try
+            {
+                return await client.GetFromJsonAsync<T>(vegpont);
+            }
+            catch (HttpRequestException)
+            {
+                return default;
+            }
+        }
+
+        /// <summary>
+        /// POST kérés küldése az API felé JSON adattal.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="vegpont"></param>
+        /// <param name="adat"></param>
+        /// <returns>HttpResponseMessage</returns>
+        public static async Task<HttpResponseMessage> PostAsync<T>(string vegpont, T adat)
+        {
+            return await client.PostAsJsonAsync(vegpont, adat);
+        }
     }
 }
