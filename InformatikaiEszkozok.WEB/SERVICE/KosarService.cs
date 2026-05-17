@@ -12,5 +12,15 @@ namespace InformatikaiEszkozok.WEB.SERVICE
         {
             Tetelek.Clear();
         }
+
+        public void TetelTorles(int termekId)
+        {
+            var tetel = Tetelek.FirstOrDefault(tetel => tetel.TermekId == termekId);
+
+            if (tetel != null)
+            {
+                Tetelek.Remove(tetel);
+            }
+        }
     }
 }

@@ -2,7 +2,18 @@
 @inject KosarService kosarService
 
 <div class="rendeles-doboz h-100">
-    <h3>Rendelési kosár</h3>
+    <div class="d-flex justify-content-between align-items-center">
+        <h3>Rendelési kosár</h3>
+
+        @if (kosarService.Tetelek.Any())
+        {
+            <button class="btn btn-outline-danger btn-sm"
+                    type="button"
+                    @onclick="KosarUritese">
+                Kosár ürítése
+            </button>
+        }
+    </div>
 
     <p>A kiválasztott termékek összesítése.</p>
 
@@ -18,7 +29,7 @@
     {
         @foreach (var tetel in kosarService.Tetelek)
         {
-            <div class="d-flex justify-content-between border-bottom py-2">
+            <div class="d-flex justify-content-between align-items-center border-bottom py-2">
                 <div>
                     <strong>@tetel.Nev</strong>
                     <span class="ms-2">
@@ -26,13 +37,21 @@
                     </span>
                 </div>
 
-                <strong>
-                    @((tetel.Mennyiseg * tetel.Egysegar).ToString("N0")) Ft
-                </strong>
+                <div class="d-flex align-items-center gap-2">
+                    <strong>
+                        @((tetel.Mennyiseg * tetel.Egysegar).ToString("N0")) Ft
+                    </strong>
+
+                    <button class="btn btn-outline-danger btn-sm"
+                            type="button"
+                            @onclick="() => TetelTorlese(tetel.TermekId)">
+                        Eltávolítás
+                    </button>
+                </div>
             </div>
         }
 
-        <div class="osszegzes-doboz mt-4">
+        <div class="osszesites-doboz mt-4 p-3 rounded">
             <p>Összesen: @Osszesen.ToString("N0") Ft</p>
             <p>Kedvezmény: @Kedvezmeny.ToString("N0") Ft</p>
             <h5>Fizetendő: @Fizetendo.ToString("N0") Ft</h5>
@@ -49,4 +68,21 @@
     private int Kedvezmeny => Kedvezmenyes ? Osszesen * 20 / 100 : 0;
 
     private int Fizetendo => Osszesen - Kedvezmeny;
+
+    /// <summary>
+    /// Kiüríti a teljes kosarat.
+    /// </summary>
+    private void KosarUritese()
+    {
+        kosarService.Urit();
+    }
+
+    /// <summary>
+    /// Eltávolít egy tételt a kosárból.
+    /// </summary>
+    /// <param name="termekId">Az eltávolítandó termék azonosítója.</param>
+    private void TetelTorlese(int termekId)
+    {
+        kosarService.TetelTorles(termekId);
+    }
 }
